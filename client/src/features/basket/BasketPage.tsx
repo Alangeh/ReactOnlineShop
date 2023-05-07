@@ -1,18 +1,18 @@
-import { useEffect, useState } from "react";
-import { Basket } from "../../app/models/basket";
-import { error } from "console";
+import { useState } from "react";
 import agent from "../../app/api/agent";
-import LoadingComponent from "../../app/layout/LoadingComponent";
-import { Box, Button, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import { Box, Button, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import { Add, Delete, Remove } from "@mui/icons-material";
 import { useStoreContext } from "../../app/context/StoreContext";
 import { LoadingButton } from "@material-ui/lab";
 import BasketSummary from "./BasketSummary";
 import { currencyFormat } from "../../app/util/util";
 import { Link } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../app/store/configureStore";
+import { removeItem, setBasket } from "./basketSlice";
 
 export default function BasketPage() {
-    const { basket, setBasket, removeItem } = useStoreContext();
+    const { basket } = useAppSelector(state => state.basket);
+    const dispatch = useAppDispatch();
     const [status, setStatus] = useState({
         loading: false,
         name: ''
@@ -21,7 +21,7 @@ export default function BasketPage() {
     function handleAddItem(productId: number, name: string) {
         setStatus({ loading: true, name });
         agent.Basket.addItem(productId)
-            .then(basket => setBasket(basket))
+            .then(basket => dispatch(setBasket(basket)))
             .catch(error => console.log(error))
             .finally(() => setStatus({ loading: false, name: '' }))
     }
@@ -29,7 +29,7 @@ export default function BasketPage() {
     function handleRemoveItem(productId: number, quantity = 1, name: string) {
         setStatus({ loading: true, name });
         agent.Basket.removeItem(productId, quantity)
-            .then(() => removeItem(productId, quantity))
+            .then(() => dispatch(removeItem({productId, quantity})))
             .catch(error => console.log(error))
             .finally(() => setStatus({ loading: false, name: '' }))
     }

@@ -34,7 +34,7 @@ export default function counterReducer(state = initialState, action: any) {
         case DECREMENT_COUNTER:
             return {
                 ...state,
-                data: state.data - action.payload
+                data: state.data - action.payloadunter
             }
         default:
             return state;
